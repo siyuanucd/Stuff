@@ -48,7 +48,17 @@ matplotlib.pyplot.show()
 ''' distribution is uniform on a circle'''
 
 # -----------------  problem 3 is written in R ----------#
-# -----------------  problem 4  -------------------------#
+# -----------------  problem 6  -------------------------#
+'''a. Simulate from this process with n=1000. Plot the resulting series. 
+b. Repeat part (a) 200 times, storing the result in a 1000x200 matrix. 
+Each column should correspond to a realization of the random process. 
+c. Compute the mean of the 200 realizations at each time point (i=1,2,…,1000).
+Plot the means. d. Plot the variance of the 200 realizations at each time 
+point (i=1,2,…,1000). Plot the variances. e. Compute the mean of each of the
+200 series across time points (j=1,2,…,200). Plot the means. 
+f. Compute the variance of each of the 200 series across time points (j=1,2,…).
+Plot the variances. g. Justify the results you have seen in 
+parts b.--f. theoretically.'''
 
 def AR(n):
     pho = 0.8
@@ -79,3 +89,50 @@ subplot(1,2,2)
 plot(range(1000),m.var(1),'g')
 show()
 
+# -----------------  problem 7  -------------------------#
+'''Monte Carlo integration.'''
+def MCI(f,n):
+    a = [f(random.uniform(0,1)) for i in range(n)]    
+    return mean(a)
+
+def f(z):
+    return math.exp(-math.pow(z,2))
+
+MCI(f,100000)  '''the expectation is about 0.74774419323398644'''
+
+
+'''importance sampling'''
+
+
+
+
+# -----------------  problem 8  -------------------------#
+'''Simulate from the linear regression model with n=100. Use the bootstrap
+ procedure to estimate the SE of  based on B=1000 bootstrap resamples.'''
+ 
+beta = [1.2,0.3,-0.9]
+
+def simReg(n,X,y):
+    y = [X[i][0]*beta[0]+X[i][1]*beta[1]+X[i][2]*beta[2]+random.uniform(0,1) for i in range(n)]
+    beta_hat = numpy.linalg.lstsq(X, y)[0]
+    return(beta_hat)
+
+
+def BS(n,B):
+    x1 = [random.uniform(0,1) for i in range(n)]
+    x2 = [random.uniform(0,1) for i in range(n)]
+    X = numpy.vstack([np.ones(n), x1, x2]).T
+    y = [X[i][0]*beta[0]+X[i][1]*beta[1]+X[i][2]*beta[2]+random.uniform(0,1) for i in range(n)]
+    
+    beta_hat= numpy.zeros((B,3))   
+    
+    for b in range(0,B):
+        sp = [random.randint(0,n-1) for i in range(n)]
+        beta_hat[b] = simReg(n,X[sp], [y[i] for i in sp])
+    return(beta_hat.std(0))
+    
+BS(100,1000)
+
+''' standard deviation of beta_hat is 0.0788, 0.1036, 0.0989
+
+ 
